@@ -55,6 +55,8 @@
 
 	(function (root) {
 
+	  root.fnQueue = [];
+
 	  root.$l = function (arg) {
 	    var htmlArray;
 	    if (typeof arg === "string") {
@@ -62,20 +64,23 @@
 	      htmlArray = [].slice.call(selected);
 	    } else if (arg instanceof HTMLElement) {
 	      htmlArray = [arg];
-	    }
-	    this.fnQueue = [];
-	    for (var i = 0; i < arguments.length; i++) {
-	      if (typeof arguments[i] === 'function') {
-	        this.fnQueue.push(arguments[i]);
+	    } else if (typeof arg === 'function') {
+	      if (document.readyState === 'complete'){
+	        arg();
+	      } else {
+	        root.fnQueue.push(arg);
 	      }
+	      return;
 	    }
-	    this.addEventListener('DOMContentLoaded', function(){
-	      for (var i = 0; i < this.fnQueue.length; i++) {
-	        this.fnQueue[i]();
-	      }
-	    }.bind(this))();
 	    return new _DOMNodeCollection(htmlArray);
 	  };
+
+	  document.addEventListener('DOMContentLoaded', function(){
+	    for (var i = 0; i < root.fnQueue.length; i++) {
+	      root.fnQueue[i]();
+	    }
+	  });
+
 
 	  ///////////////////////////////////////////////
 
@@ -195,7 +200,13 @@
 	  };
 
 	  function merge(obj, obj2) {
-	    
+	    obj = (JSON.parse(JSON.stringify(obj)));
+	    for (var i = 0; i < obj2.length; i++) {
+	      var key = Object.keys(obj2)[i];
+	      var value = obj2[key];
+	      obj[key] = value;
+	    }
+	    return obj;
 	  }
 
 
