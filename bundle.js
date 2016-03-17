@@ -63,8 +63,17 @@
 	    } else if (arg instanceof HTMLElement) {
 	      htmlArray = [arg];
 	    }
-
-
+	    this.fnQueue = [];
+	    for (var i = 0; i < arguments.length; i++) {
+	      if (typeof arguments[i] === 'function') {
+	        this.fnQueue.push(arguments[i]);
+	      }
+	    }
+	    this.addEventListener('DOMContentLoaded', function(){
+	      for (var i = 0; i < this.fnQueue.length; i++) {
+	        this.fnQueue[i]();
+	      }
+	    }.bind(this))();
 	    return new _DOMNodeCollection(htmlArray);
 	  };
 
@@ -173,6 +182,21 @@
 
 	  };
 
+	  _DOMNodeCollection.prototype.on = function(trigger, listener) {
+	    for (var i = 0; i < this.array.length; i++) {
+	      this.array[i].addEventListener(trigger, listener);
+	    }
+	  };
+
+	  _DOMNodeCollection.prototype.off = function(trigger, listener) {
+	    for (var i = 0; i < this.array.length; i++) {
+	      this.array[i].removeEventListener(trigger, listener);
+	    }
+	  };
+
+	  function merge(obj, obj2) {
+	    
+	  }
 
 
 
