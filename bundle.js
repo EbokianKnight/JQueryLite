@@ -72,7 +72,39 @@
 	      }
 	      return;
 	    }
+
 	    return new _DOMNodeCollection(htmlArray);
+	  };
+
+	  root.$l.ajax = function(object) {
+	    var defaultOptions = {
+	      success: function (data) { console.log(data); },
+	      error: function () { console.log("Kablamo~~"); },
+	      url: "http://api.openweathermap.org/data/2.5/weather?q=NY,NY&appid=bcb83c4b54aee8418983c2aff3073b3b",
+	      method: 'GET',
+	      data: {},
+	      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
+	    };
+	    var options;
+	    if (object) {
+	      options = merge(defaultOptions, object);
+	    } else {
+	      options = defaultOptions;
+	    }
+	    var httpRequest = new XMLHttpRequest();
+	    httpRequest.onreadystatechange = function() {
+	      if (httpRequest.readyState == XMLHttpRequest.DONE ) {
+	        if (httpRequest.status == 200) {
+
+	          options.success(JSON.parse(httpRequest.responseText));
+	        } else {
+	          options.error();
+	        }
+	      }
+	    };
+	    httpRequest.open(options.method, options.url);
+	    httpRequest.send(options.contentType, options.data);
+
 	  };
 
 	  document.addEventListener('DOMContentLoaded', function(){
@@ -201,8 +233,9 @@
 
 	  function merge(obj, obj2) {
 	    obj = (JSON.parse(JSON.stringify(obj)));
-	    for (var i = 0; i < obj2.length; i++) {
-	      var key = Object.keys(obj2)[i];
+	    var obj2Keys = Object.keys(obj2);
+	    for (var i = 0; i < obj2Keys.length; i++) {
+	      var key = obj2Keys[i];
 	      var value = obj2[key];
 	      obj[key] = value;
 	    }
